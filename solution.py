@@ -129,10 +129,49 @@ def only_choice(values):
     return values
 
 def reduce_puzzle(values):
-    pass
+    stalled = False
+    while not stalled:
+        # Check how many boxes have a determined value
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+        # Your code here: Use the Eliminate Strategy
+        values = eliminate(values)
+        # Your code here: Use the Only Choice Strategy
+        values = only_choice(values)
+        # Check how many boxes have a determined value, to compare
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+        # If no new values were added, stop the loop.
+        stalled = solved_values_before == solved_values_after
+        # Sanity check, return False if there is a box with zero available values:
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
+    return values
 
 def search(values):
-    pass
+    "Using depth-first search and propagation, create a search tree and solve the sudoku."
+    # First, reduce the puzzle using the previous function
+    values = reduce_puzzle(values)
+    if values is False:
+        return False
+    # すべてのboxの値が確定している場合
+    if all(len(values[s]) == 1 for s in boxes):
+        return values
+
+    # Choose one of the unfilled squares with the fewest possibilities
+    # 複数の候補があるboxについて、候補数が最も少ないbox（と長さ）を取得する
+    # s:box名, n:候補数
+    s,n = min((s, len(values[s])) for s in boxes if len(values[s]) > 1)
+
+    # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
+    # boxの候補を1つに固定して再帰で探索。解が見つかったら返す。
+    for value in values[s]:
+        attempt_values = values.copy()
+        attempt_values[s] = value
+        attempt = search(attempt_values)
+        if attempt:
+            return attempt
+    # If you're stuck, see the solution.py tab!
+    # 解が見つからなかった場合
+    return False
 
 def solve(grid):
     """
