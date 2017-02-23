@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 assignments = []
 
 def assign_value(values, box, value):
@@ -22,9 +24,21 @@ def naked_twins(values):
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
 
-def cross(A, B):
+rows = 'ABCDEFGHI'
+cols = '123456789'
+
+def cross(a, b):
     "Cross product of elements in A and elements in B."
-    pass
+    return [s+t for s in a for t in b]
+
+boxes = cross(rows, cols)
+
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+unitlist = row_units + column_units + square_units
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
 def grid_values(grid):
     """
@@ -36,7 +50,8 @@ def grid_values(grid):
             Keys: The boxes, e.g., 'A1'
             Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
     """
-    pass
+    values = [x if x != '.' else '123456789' for x in grid]
+    return dict(zip(boxes, values))
 
 def display(values):
     """
@@ -44,13 +59,74 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    pass
+    width = 1+max(len(values[s]) for s in boxes)
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                      for c in cols))
+        if r in 'CF': print(line)
+    return
 
 def eliminate(values):
+    """Eliminate values from peers of each box with a single value.
+
+    Go through all the boxes, and whenever there is a box with a single value,
+    eliminate this value from the set of values of all its peers.
+
+    Args:
+        values: Sudoku in dictionary form.
+    Returns:
+        Resulting Sudoku in dictionary form after eliminating values.
+    """
+    # 各ユニット内で確定している数字を除く。
+    values_new = values.copy()
+    for box in boxes:
+        units = [u for u in unitlist if box in u]
+        for unit in units:
+            elims = [values[x] for x in unit if len(values[x]) == 1 and x != box]
+            for e in elims:
+                values_new[box] = values_new[box].replace(e, '')
+    values = values_new.copy()
+    return values
+
+def trace(s):
+    #print (s)
     pass
 
+import sys
+
 def only_choice(values):
-    pass
+    """Finalize all values that are the only choice for a unit.
+
+    Go through all the units, and whenever there is a unit with a value
+    that only fits in one box, assign the value to this box.
+
+    Input: Sudoku in dictionary form.
+    Output: Resulting Sudoku in dictionary form after filling in only choices.
+    """
+    # 各ユニット内で1ヵ所にしか候補が無い数字を確定させる。
+    # TODO: Implement only choice strategy here
+    values2 = values.copy()
+    for box in boxes:
+        trace("box: %s" % box)
+        # boxの属するunitを探す
+        units = [u for u in unitlist if box in u]
+        for unit in units:
+            trace("unit: %s" % unit)
+            # peerに出てくる候補の数字をすべて連結する
+            all = ''.join([values[p] for p in unit])
+            trace("all: %s" % all)
+            # 候補の数字のunit内での出現回数を調べ、1回だけ候補になっている数字を取得する
+            only_chars = list(set([ch for ch in all if all.count(ch) == 1]))
+            trace("only_chars: %s" % only_chars)
+            for ch in only_chars:
+                for b in unit:
+                    if ch in values[b] and b != box:
+                        values2[b] = ch
+                        trace("set %s, %s => %s" % (b, values[b], ch))
+    values = values2.copy()
+#    display(values)
+    return values
 
 def reduce_puzzle(values):
     pass
