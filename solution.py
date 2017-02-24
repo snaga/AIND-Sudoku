@@ -23,6 +23,25 @@ def naked_twins(values):
 
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
+    for unit in unitlist:
+        v = {}
+        for k in unit:
+            v[k] = values[k]
+        trace("v.values() = %s" % v.values())
+        twins = list(set([x for x in v.values() if v.values().count(x) == 2 and len(x) == 2]))
+        trace("twins = %s" % twins)
+        elim = list(set([x for x in ''.join(twins)]))
+        trace("elim = %s" % elim)
+        for k in v:
+            for e in elim:
+                if values[k] not in twins:
+                    trace("eliminating %s" % e)
+                    v[k] = v[k].replace(e, '')
+        trace("v = %s" % v)
+        for k in v:
+            values[k] = v[k]
+
+    return values
 
 rows = 'ABCDEFGHI'
 cols = '123456789'
