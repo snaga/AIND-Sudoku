@@ -103,17 +103,23 @@ def eliminate(values):
     # ja: 各ユニット内で確定している数字を除く。
     values_new = values.copy()
     for box in boxes:
+        trace("box: %s" % box)
         units = [u for u in unitlist if box in u]
         for unit in units:
+            trace("unit: %s" % unit)
             elims = [values[x] for x in unit if len(values[x]) == 1 and x != box]
+            trace("elims: %s" % ''.join(elims))
             for e in elims:
+                trace("eliminating: %s => %s" % (values_new[box], values_new[box].replace(e, '')))
                 values_new[box] = values_new[box].replace(e, '')
+                assert len(values_new[box]) > 0
     values = values_new.copy()
     return values
 
+enable_trace = False
 def trace(s):
-    #print (s)
-    pass
+    if enable_trace:
+        print (s)
 
 import sys
 
