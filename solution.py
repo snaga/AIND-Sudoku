@@ -99,7 +99,8 @@ def eliminate(values):
     Returns:
         Resulting Sudoku in dictionary form after eliminating values.
     """
-    # 各ユニット内で確定している数字を除く。
+    # eliminate values, which is fixed in the peers, from possible values.
+    # ja: 各ユニット内で確定している数字を除く。
     values_new = values.copy()
     for box in boxes:
         units = [u for u in unitlist if box in u]
@@ -125,19 +126,23 @@ def only_choice(values):
     Input: Sudoku in dictionary form.
     Output: Resulting Sudoku in dictionary form after filling in only choices.
     """
-    # 各ユニット内で1ヵ所にしか候補が無い数字を確定させる。
+    # Fix the values which appear only once in each unit.
+    # ja: 各ユニット内で1ヵ所にしか候補が無い数字を確定させる。
     # TODO: Implement only choice strategy here
     values2 = values.copy()
     for box in boxes:
         trace("box: %s" % box)
-        # boxの属するunitを探す
+        # Find units where this box belongs
+        # ja: boxの属するunitを探す
         units = [u for u in unitlist if box in u]
         for unit in units:
             trace("unit: %s" % unit)
-            # peerに出てくる候補の数字をすべて連結する
+            # Concatinate all possible values in peers of this unit
+            # ja: peerに出てくる候補の数字をすべて連結する
             all = ''.join([values[p] for p in unit])
             trace("all: %s" % all)
-            # 候補の数字のunit内での出現回数を調べ、1回だけ候補になっている数字を取得する
+            # Find possible values which appear only once in the peers
+            # ja: 候補の数字のunit内での出現回数を調べ、1回だけ候補になっている数字を取得する
             only_chars = list(set([ch for ch in all if all.count(ch) == 1]))
             trace("only_chars: %s" % only_chars)
             for ch in only_chars:
@@ -173,17 +178,18 @@ def search(values):
     values = reduce_puzzle(values)
     if values is False:
         return False
-    # すべてのboxの値が確定している場合
+    # In case all boxes have been fixed.
+    # ja: すべてのboxの値が確定している場合
     if all(len(values[s]) == 1 for s in boxes):
         return values
 
     # Choose one of the unfilled squares with the fewest possibilities
-    # 複数の候補があるboxについて、候補数が最も少ないbox（と長さ）を取得する
-    # s:box名, n:候補数
+    # ja: 複数の候補があるboxについて、候補数が最も少ないbox（と長さ）を取得する
+    # ja: s:box名, n:候補数
     s,n = min((s, len(values[s])) for s in boxes if len(values[s]) > 1)
 
     # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
-    # boxの候補を1つに固定して再帰で探索。解が見つかったら返す。
+    # ja: boxの候補を1つに固定して再帰で探索。解が見つかったら返す。
     for value in values[s]:
         attempt_values = values.copy()
         attempt_values[s] = value
@@ -191,7 +197,8 @@ def search(values):
         if attempt:
             return attempt
     # If you're stuck, see the solution.py tab!
-    # 解が見つからなかった場合
+    # When there is no solution...
+    # ja: 解が見つからなかった場合
     return False
 
 def solve(grid):
