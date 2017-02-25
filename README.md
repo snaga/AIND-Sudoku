@@ -3,11 +3,11 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: First, we search a pair of boxes which have the same 2-possible values (e.g.'23') in the unit. Second, those 2-possible values (e.g. '2' and '3') in the other boxes must be eliminated from the possible values because those two values can be appered only in the pair of boxes. Thus, "constraint" (reduced possibilities) could be propagated to the other boxes by eliminating possible characters with the Naked Twins technique.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: The diagonal constraint looks similar to the regular (rows, cols and squares) constraints. Every value can be appeared only once in the unit (a diagonal), so we can eliminate the (possible) value which is already determined in the other boxes in the unit. Thus, eliminating possible values (constraint) in diagonals can be propagated to the other units (rows, cols, squares and another diagonal).
 
 ### Install
 
